@@ -59,7 +59,7 @@ class DuckDad:
     # sistema de fome
     def feed(self, food_value):
         if food_value <= 0:
-            return "Erro: Valor inválido."
+            return "Valor inválido."
             
         if self._hunger < 10:
             return f"{self.name} não quer comer agora."
@@ -71,7 +71,7 @@ class DuckDad:
     # sistema de sede
     def drink(self, water_value):
         if water_value <= 0:
-            return "Erro: Valor inválido."
+            return "Valor inválido."
             
         if self._thirst < 10:
             return f"{self.name} não quer beber agora."
@@ -83,7 +83,7 @@ class DuckDad:
     # sistema de estresse
     def smoking(self, smoking_value):
         if smoking_value <= 0:
-            return "Erro: Valor inválido."
+            return "Valor inválido."
             
         if not self._is_smoker:
             self._is_smoker = True
@@ -101,7 +101,7 @@ class DuckDad:
     # sistema de alcool
     def drinking_alcohol(self, alcohol_value):
         if alcohol_value <= 0:
-            return "Erro: Valor inválido."
+            return "Valor inválido."
             
         if not self._is_alcoholic:
             self._is_alcoholic = True
