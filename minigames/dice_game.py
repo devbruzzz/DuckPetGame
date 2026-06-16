@@ -21,6 +21,8 @@ class Game:
         self.turno = 0
         self.rodando = True
 
+    # ── helpers ──────────────────────────────────────────────
+
     def status_text(self) -> str:
         return (
             f"=== Status do jogo ===\n"
@@ -44,6 +46,8 @@ class Game:
         self.wallet.earn(reward)
         self.duck.pass_time()
         return f"{message}\nVoce ganhou {reward} moedas e agora tem {self.wallet}."
+
+    # ── ações do menu ─────────────────────────────────────────
 
     def _acao_loja(self):
         while True:
@@ -85,8 +89,10 @@ class Game:
             frase = random.choice(frases_normais)
 
         mensagem_evento(f"{self.duck.name} diz: {frase}")
+        # conversar reduz estresse levemente
         self.duck._stress = max(0, self.duck._stress - 5)
 
+    # ── verificações de fim de jogo ───────────────────────────
 
     def _verificar_game_over(self) -> bool:
         if self.duck.hunger >= 100 and self.duck.stress >= 100:
@@ -95,6 +101,7 @@ class Game:
             return True
         return False
 
+    # ── LOOP PRINCIPAL ────────────────────────────────────────
 
     def rodar(self):
         while self.rodando:
@@ -109,8 +116,10 @@ class Game:
                 self.rodando = False
                 break
 
+            # 3. Lê ação do jogador
             opcao = exibir_menu_principal()
 
+            # 4. Executa ação
             if opcao == "1":
                 self._acao_loja()
             elif opcao == "2":
@@ -128,4 +137,5 @@ class Game:
             else:
                 mensagem_evento("Opção inválida. O pato te olhou torto.")
 
+            # 5. Passa o tempo — atributos se degradam a cada turno
             self.duck.pass_time()
