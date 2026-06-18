@@ -3,7 +3,6 @@ from typing import List, Optional
 
 from models.duck import DuckDad
 
-
 @dataclass
 class ShopItem:
     id: int
@@ -13,7 +12,7 @@ class ShopItem:
     effect: str
     value: int = 0
 
-
+# sistema de carteira e economia
 class Wallet:
     def __init__(self, coins: int = 100):
         self.coins = max(0, coins)
@@ -34,11 +33,12 @@ class Wallet:
     def __str__(self) -> str:
         return f"{self.coins} moedas"
 
-
+# classe principal da loja
 class Store:
     def __init__(self, items: Optional[List[ShopItem]] = None):
         self.items = items or []
 
+    # configuracao dos itens padrao da loja
     @staticmethod
     def default() -> "Store":
         items = [
@@ -80,9 +80,18 @@ class Store:
                 effect="alcohol",
                 value=20,
             ),
+            ShopItem(
+                id=6, 
+                name="Maco de cigarro", 
+                price=15, 
+                description="Diminui o estresse rapidamente.", 
+                effect="smoke", 
+                value=25
+            ),
         ]
         return Store(items)
 
+    # sistema de formatacao da prateleira
     def list_items(self) -> List[str]:
         lines = []
         for item in self.items:
@@ -91,9 +100,11 @@ class Store:
             )
         return lines
 
+    # sistema de busca de item
     def find_item(self, item_id: int) -> Optional[ShopItem]:
         return next((item for item in self.items if item.id == item_id), None)
 
+    # sistema de processamento de compra
     def purchase(self, item_id: int, wallet: Wallet, duck: DuckDad) -> str:
         item = self.find_item(item_id)
         if item is None:
@@ -105,6 +116,7 @@ class Store:
         wallet.spend(item.price)
         return self.apply_item(item, duck)
 
+    # sistema de aplicacao do efeito do item no pato
     def apply_item(self, item: ShopItem, duck: DuckDad) -> str:
         if item.effect == "feed":
             return duck.feed(item.value)
@@ -116,4 +128,6 @@ class Store:
             return duck.heal()
         if item.effect == "alcohol":
             return duck.drinking_alcohol(item.value)
+        if item.effect == "smoke":
+            return duck.smoking(item.value)
         return "O item foi comprado, mas nada aconteceu."

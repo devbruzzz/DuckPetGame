@@ -1,16 +1,13 @@
 import random
 import time
 
-
 class DiceGame:
+    # sistema de configuracao de apostas
     def __init__(self):
         self.aposta_minima = 10
 
+    # sistema principal do cassino do pato
     def play(self, wallet) -> tuple[str, int]:
-        """
-        Retorna (mensagem, ganho_liquido).
-        ganho_liquido positivo = ganhou, negativo = perdeu, 0 = empate.
-        """
         if wallet.coins < self.aposta_minima:
             return f"Você não tem moedas suficientes. (mínimo {self.aposta_minima})", 0
 

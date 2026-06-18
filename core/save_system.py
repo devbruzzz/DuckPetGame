@@ -3,8 +3,9 @@ import os
 import sys
 from pathlib import Path
 from datetime import datetime
+from typing import Optional
 
-
+# sistema de configuracao de pasta segura
 def _get_save_dir() -> Path:
     if sys.platform == "win32":
         base = Path(os.environ.get("APPDATA", Path.home()))
@@ -17,11 +18,11 @@ def _get_save_dir() -> Path:
     save_dir.mkdir(parents=True, exist_ok=True)
     return save_dir
 
-
+# variaveis globais de arquivo
 SAVE_FILE = _get_save_dir() / "save.json"
 BACKUP_FILE = _get_save_dir() / "save_backup.json"
 
-
+# sistema de salvar os dados no json
 def save_game(duck, wallet, turno: int) -> None:
     if SAVE_FILE.exists():
         try:
@@ -53,8 +54,8 @@ def save_game(duck, wallet, turno: int) -> None:
     except Exception as e:
         print(f"\n Erro ao salvar: {e}")
 
-
-def load_game() -> dict | None:
+# sistema de leitura e carregamento do save
+def load_game() -> Optional[dict]:
     for arquivo in (SAVE_FILE, BACKUP_FILE):
         if not arquivo.exists():
             continue
@@ -69,7 +70,7 @@ def load_game() -> dict | None:
 
     return None
 
-
+# sistema de exclusao de save
 def delete_save() -> bool:
     apagou = False
     for arquivo in (SAVE_FILE, BACKUP_FILE):
@@ -78,15 +79,15 @@ def delete_save() -> bool:
             apagou = True
     return apagou
 
-
+# sistema de checagem
 def save_exists() -> bool:
     return SAVE_FILE.exists() or BACKUP_FILE.exists()
 
-
+# sistema de texto de informacoes do save
 def save_info() -> str:
     data = load_game()
     if data is None:
-        return " Nenhum save encontrado. Começando um novo jogo!"
+        return " Nenhum save encontrado. Comecando um novo jogo!"
     return (
         f" Save encontrado!\n"
         f" Pato: {data['pato']['nome']}  | "

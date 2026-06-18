@@ -12,13 +12,14 @@ class HangmanGame:
         self.max_errors = 6
         self.reward = 30
 
+    # sistema principal de adivinhacao
     def play(self) -> tuple[str, int]:
         word = random.choice(self.words)
         guessed_letters = set()
         errors = 0
 
         print("\n" + "="*35)
-        print("     JOGO DA FORCA DO PATO")
+        print("JOGO DA FORCA DO PATO")
         print("="*35)
         print(f" Dica: Palavras do universo do jogo!\n Recompensa: {self.reward} moedas.")
 

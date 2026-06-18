@@ -54,27 +54,6 @@ class DuckDad:
             self._is_sick = True
         elif self._alcohol < 0: 
             self._alcohol = 0
-
-        # mensagens de status
-        if self._hunger == 0:
-            print(f"{self.name} está de barriga cheia!")
-        elif self._hunger >= 85:
-            print(f"{self.name} está com muita fome. Alimente ele agora!")
-
-        if self._thirst == 0:
-            print(f"{self.name} está totalmente hidratado!")
-        elif self._thirst >= 85:
-            print(f"{self.name} está com sede. Dê água para ele!")
-
-        if self._stress == 0:
-            print(f"{self.name} está totalmente relaxado!")
-        elif self._stress >= 85:
-            print(f"{self.name} está muito estressado. Ajude ele a relaxar!")
-
-        if self._alcohol == 0:
-            print(f"A vontade de beber álcool de {self.name} está saciada!")
-        elif self._alcohol >= 85:
-            print(f"{self.name} está em crise de abstinência! Dê álcool para ele!")
     
     # sistema de fome
     def feed(self, food_value):
@@ -176,13 +155,14 @@ class DuckDad:
     def change_name(self, new_name):
         self.name = new_name
         return f"Nome alterado para {self.name}!"
+    
+    # sistema de reprodução
+    def reproduce(self, baby_name):
+        return DuckSon(baby_name)
 
-# sistema de reprodução
+# patinho
 class DuckSon(DuckDad):
     def __init__(self, name):
         super().__init__(name)
         self._is_smoker = False
         self._is_alcoholic = False
-
-    def reproduce(self, baby_name):
-        return DuckSon(baby_name)

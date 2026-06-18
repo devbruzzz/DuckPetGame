@@ -1,7 +1,7 @@
 import random
 
-
 class CarRacing:
+    # sistema de configuracao de pistas
     def __init__(self):
         self.track_names = [
             "Pista do Parque",
@@ -10,6 +10,7 @@ class CarRacing:
             "Autodromo do Pato"
         ]
 
+    # sistema principal de jogatina
     def play(self) -> tuple[str, int]:
         track = random.choice(self.track_names)
         performance = random.randint(1, 100)

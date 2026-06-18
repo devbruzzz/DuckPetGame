@@ -1,10 +1,15 @@
 import random
 
+from core.events import EventManager
 from core.save_system import save_game, load_game, delete_save, save_info
 from core.store import Store, Wallet
+
 from minigames.car_racing import CarRacing
 from minigames.dice_game import DiceGame
+from minigames.hangman_game import HangmanGame
+
 from models.duck import DuckDad
+
 from ui.display import (
     exibir_status,
     exibir_menu_principal,
@@ -14,16 +19,20 @@ from ui.display import (
 )
 
 class Game:
+    # sistema de inicializacao do jogo
     def __init__(self, duck_name: str = "Pato", starting_coins: int = 100):
         self.duck = DuckDad(duck_name)
         self.wallet = Wallet(starting_coins)
         self.store = Store.default()
+        self.event_manager = EventManager()
         self.turno = 0
         self.rodando = True
 
+    # sistema de salvamento
     def salvar(self) -> None:
         save_game(self.duck, self.wallet, self.turno)
 
+    # sistema de carregamento
     def carregar(self, data: dict) -> None:
         pato_data = data["pato"]
         self.duck.name        = pato_data["nome"]
@@ -37,33 +46,16 @@ class Game:
         self.wallet.coins     = data["moedas"]
         self.turno            = data["turno"]
 
-    def status_text(self) -> str:
-        return (
-            f"=== Status do jogo ===\n"
-            f"Nome: {self.duck.name}\n"
-            f"Saldo: {self.wallet}\n"
-            f"Fome: {self.duck.hunger}\n"
-            f"Sede: {self.duck.thirst}\n"
-            f"Estresse: {self.duck.stress}\n"
-            f"Vontade de beber: {self.duck.alcohol}\n"
-            f"Doente: {'Sim' if self.duck.is_sick else 'Nao'}"
-        )
-
-    def shop_text(self) -> str:
-        return "\n".join(self.store.list_items())
-
+    # acao basica de compra
     def buy(self, item_id: int) -> str:
         return self.store.purchase(item_id, self.wallet, self.duck)
 
-    def play_race(self) -> str:
-        message, reward = CarRacing().play()
-        self.wallet.earn(reward)
-        self.duck.pass_time()
-        return f"{message}\nVoce ganhou {reward} moedas e agora tem {self.wallet}."
-
+    # acao de abrir a loja interativa
     def _acao_loja(self):
         while True:
-            op = exibir_loja(self.shop_text())
+            texto_loja = "\n".join(self.store.list_items())
+            op = exibir_loja(texto_loja)
+            
             if op == "0":
                 break
             try:
@@ -71,22 +63,31 @@ class Game:
                 resultado = self.buy(item_id)
                 mensagem_evento(resultado)
             except ValueError:
-                mensagem_evento("ID inválido.")
+                mensagem_evento("ID invalido.")
 
+    # acao do minigame de corrida
     def _acao_corrida(self):
         msg, reward = CarRacing().play()
         self.wallet.earn(reward)
         mensagem_evento(f"{msg}\n  +{reward} moedas  |  total: {self.wallet}")
 
+    # acao do minigame de forca
+    def _acao_forca(self):
+        msg, reward = HangmanGame().play()
+        self.wallet.earn(reward)
+        mensagem_evento(f"{msg}\n  +{reward} moedas  |  total: {self.wallet}")
+
+    # acao do minigame de dados
     def _acao_dados(self):
         msg, _ = DiceGame().play(self.wallet)
         mensagem_evento(msg)
 
+    # acao de conversar e interagir
     def _acao_conversar(self):
         frases_normais = [
             "QUACK! (oi, oi, oi!)",
-            "quack... (tô entediado)",
-            "QUACK QUACK! (me dá biscoito!)",
+            "quack... (to entediado)",
+            "QUACK QUACK! (me da biscoito!)",
             "quack~ (gostei dessa conversa)",
         ]
         if self.duck.hunger >= 70:
@@ -94,15 +95,39 @@ class Game:
         elif self.duck.stress >= 70:
             frase = "quack... (muito estressado, preciso relaxar)"
         elif self.duck.alcohol >= 70:
-            frase = "quaaaaack... (tô em crise, preciso da bebida)"
+            frase = "quaaaaack... (to em crise, preciso da bebida)"
         elif self.duck.is_sick:
-            frase = "quack... *tosse* (tô doente, leva no vet)"
+            frase = "quack... *tosse* (to doente, leva no vet)"
         else:
             frase = random.choice(frases_normais)
 
         mensagem_evento(f"{self.duck.name} diz: {frase}")
         self.duck._stress = max(0, self.duck._stress - 5)
 
+    # acao de mudanca de nome
+    def _acao_mudar_nome(self):
+        print("\n" + "="*44)
+        novo_nome = input("  Digite o novo nome do pato: ").strip()
+        if novo_nome:
+            msg = self.duck.change_name(novo_nome)
+            mensagem_evento(msg)
+        else:
+            mensagem_evento("Nome invalido.")
+
+    # acao de criar um filho
+    def _acao_reproduzir(self):
+        print("\n" + "="*44)
+        print("  Se tiver um filhote, o seu pato atual vai se aposentar.")
+        confirmacao = input("  Tem certeza que deseja continuar? (s/n): ").strip().lower()
+        if confirmacao == "s":
+            nome_filhote = input("  Qual sera o nome do filhote? ").strip()
+            if not nome_filhote:
+                nome_filhote = "Duckinho Jr"
+            
+            self.duck = self.duck.reproduce(nome_filhote)
+            mensagem_evento(f" Um ovo chocou! O pato velho aposentou-se.\n  Bem-vindo a nova geracao, {self.duck.name}!")
+
+    # sistema de morte do pato
     def _verificar_game_over(self) -> bool:
         if self.duck.hunger >= 100 and self.duck.stress >= 100:
             return True
@@ -110,39 +135,16 @@ class Game:
             return True
         return False
 
-    def _evento_aleatorio(self):
-        if random.random() > 0.2:
-            return
-
-        eventos = ["moedas", "doente", "fome", "sorte"]
-        escolha = random.choice(eventos)
-
-        if escolha == "moedas":
-            achadas = random.randint(5, 15)
-            self.wallet.earn(achadas)
-            mensagem_evento(f"Surpresa! {self.duck.name} achou {achadas} moedas perdidas no chão!")
-            
-        elif escolha == "doente":
-            self.duck._is_sick = True
-            mensagem_evento(f"Oh não! {self.duck.name} comeu um lixo estragado e ficou doente!")
-            
-        elif escolha == "fome":
-            self.duck._hunger = min(100, self.duck._hunger + 20)
-            mensagem_evento(f"{self.duck.name} correu muito atrás de um inseto e ficou com muita fome!")
-            
-        elif escolha == "sorte":
-            self.duck._stress = max(0, self.duck._stress - 20)
-            mensagem_evento(f"Que sorte! {self.duck.name} encontrou um lugar perfeito e relaxou bastante (-20 Estresse).")
-
+    # loop central do jogo
     def rodar(self):
         while self.rodando:
             self.turno += 1
             exibir_status(self.duck, self.wallet, self.turno)
 
-            #  Verifica game over
+            # verifica game over
             if self._verificar_game_over():
                 tela_game_over(self.duck, self.turno)
-                # Apaga o save ao perder
+                # apaga o save ao perder
                 delete_save()
                 self.rodando = False
                 break
@@ -156,18 +158,28 @@ class Game:
             elif opcao == "3":
                 self._acao_dados()
             elif opcao == "4":
-                self._acao_conversar()
+                self._acao_forca()
             elif opcao == "5":
+                self._acao_conversar()
+            elif opcao == "6":
                 mensagem_evento("O tempo passou...")
+            elif opcao == "7":
+                self._acao_mudar_nome()
+            elif opcao == "8":
+                self._acao_reproduzir()
             elif opcao == "0":
-                # Salva antes de sair
                 self.salvar()
-                print(f"\n  Até logo! {self.duck.name} vai sentir sua falta. 🦆")
+                print(f"\n  Ate logo! {self.duck.name} vai sentir sua falta. 🦆")
                 self.rodando = False
                 break
             else:
-                mensagem_evento("Opção inválida. O pato te encarou em silêncio.")
+                mensagem_evento("Opcao invalida. O pato te encarou em silencio.")
 
-            self._evento_aleatorio()
+            # sorteio de imprevistos
+            mensagem = self.event_manager.trigger_event(self.duck, self.wallet)
+            
+            if mensagem:
+                mensagem_evento(mensagem)
+
             self.salvar()
             self.duck.pass_time()

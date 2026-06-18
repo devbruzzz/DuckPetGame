@@ -1,122 +1,81 @@
 import random
-
+from typing import Optional
 
 class EventManager:
-
     def __init__(self):
         pass
 
-    def trigger_event(self, duck):
-
+    # sistema de sorteio de evento
+    def trigger_event(self, duck, wallet) -> Optional[str]:
         # 25% de chance de ocorrer um evento
         if random.randint(1, 100) > 25:
             return None
 
         events = [
-
             self.find_food,
-
             self.find_water,
-
             self.bad_night,
-
             self.party,
-
             self.rain,
-
             self.get_sick,
-
             self.win_money,
-
             self.lonely_day
         ]
 
         event = random.choice(events)
-
-        return event(duck)
+        return event(duck, wallet)
 
     # -------------------------
     # EVENTOS
     # -------------------------
 
-    def find_food(self, duck):
+    # evento de achar comida
+    def find_food(self, duck, wallet):
+        duck._hunger = max(0, duck._hunger - 15)
+        duck._check_limits()
+        return f"🍞 {duck.name} encontrou comida na rua! (-15 fome)"
 
-        duck.hunger = max(
-            0,
-            duck.hunger - 15
-        )
+    # evento de achar agua
+    def find_water(self, duck, wallet):
+        duck._thirst = max(0, duck._thirst - 15)
+        duck._check_limits()
+        return f"🚰 {duck.name} encontrou uma poca de agua. (-15 sede)"
 
-        return "🍞 Duckinho encontrou comida na rua! (-15 fome)"
+    # evento de insonia
+    def bad_night(self, duck, wallet):
+        duck._stress = min(100, duck._stress + 20)
+        duck._check_limits()
+        return f"🌙 {duck.name} teve uma noite ruim. (+20 estresse)"
 
-    def find_water(self, duck):
+    # evento de festa
+    def party(self, duck, wallet):
+        duck._stress = max(0, duck._stress - 20)
+        duck._alcohol = min(100, duck._alcohol + 10)
+        duck._check_limits()
+        return f"🎉 {duck.name} foi para uma festa! (-20 estresse, +10 abstinencia)"
 
-        duck.thirst = max(
-            0,
-            duck.thirst - 15
-        )
+    # evento de chuva
+    def rain(self, duck, wallet):
+        duck._thirst = max(0, duck._thirst - 10)
+        duck._stress = max(0, duck._stress - 10)
+        duck._check_limits()
+        return f"🌧️ Um dia chuvoso deixou {duck.name} relaxado."
 
-        return "🚰 Duckinho encontrou uma poça de água. (-15 sede)"
-
-    def bad_night(self, duck):
-
-        duck.stress = min(
-            100,
-            duck.stress + 20
-        )
-
-        return "🌙 Duckinho teve uma noite ruim. (+20 estresse)"
-
-    def party(self, duck):
-
-        duck.stress = max(
-            0,
-            duck.stress - 20
-        )
-
-        duck.alcohol = min(
-            100,
-            duck.alcohol + 10
-        )
-
-        return "🎉 Duckinho foi para uma festa! (-20 estresse, +10 abstinência)"
-
-    def rain(self, duck):
-
-        duck.thirst = max(
-            0,
-            duck.thirst - 10
-        )
-
-        duck.stress = max(
-            0,
-            duck.stress - 10
-        )
-
-        return "🌧️ Um dia chuvoso deixou Duckinho relaxado."
-
-    def get_sick(self, duck):
-
-        if duck.hunger > 70 or duck.thirst > 70:
-
-            duck.is_sick = True
-
-            return "🤒 Duckinho ficou doente por falta de cuidados!"
-
+    # evento de doenca surpresa
+    def get_sick(self, duck, wallet):
+        if duck._hunger > 70 or duck._thirst > 70:
+            duck._is_sick = True
+            return f"🤒 {duck.name} ficou doente por falta de cuidados!"
         return None
 
-    def win_money(self, duck):
+    # evento de achar dinheiro
+    def win_money(self, duck, wallet):
+        achadas = random.randint(10, 30)
+        wallet.earn(achadas)
+        return f"💰 {duck.name} encontrou {achadas} moedas perdidas!"
 
-        if hasattr(duck, "coins"):
-
-            duck.coins += 20
-
-        return "💰 Duckinho encontrou 20 moedas!"
-
-    def lonely_day(self, duck):
-
-        duck.stress = min(
-            100,
-            duck.stress + 15
-        )
-
-        return "😔 Duckinho passou o dia sozinho. (+15 estresse)"
+    # evento de solidao
+    def lonely_day(self, duck, wallet):
+        duck._stress = min(100, duck._stress + 15)
+        duck._check_limits()
+        return f"😔 {duck.name} passou o dia sozinho. (+15 estresse)"

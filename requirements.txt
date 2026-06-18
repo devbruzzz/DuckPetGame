@@ -1,1 +1,0 @@
-# Lista de dependências e bibliotecas externas do projeto.
