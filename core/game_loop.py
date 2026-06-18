@@ -8,7 +8,7 @@ from minigames.car_racing import CarRacing
 from minigames.dice_game import DiceGame
 from minigames.hangman_game import HangmanGame
 
-from models.duck import DuckDad
+from models.duck import DuckDad, DuckSon
 
 from ui.display import (
     exibir_status,
@@ -22,6 +22,7 @@ class Game:
     # sistema de inicializacao do jogo
     def __init__(self, duck_name: str = "Pato", starting_coins: int = 100):
         self.duck = DuckDad(duck_name)
+        self.filhote = None
         self.wallet = Wallet(starting_coins)
         self.store = Store.default()
         self.event_manager = EventManager()
@@ -30,7 +31,7 @@ class Game:
 
     # sistema de salvamento
     def salvar(self) -> None:
-        save_game(self.duck, self.wallet, self.turno)
+        save_game(self.duck, self.wallet, self.turno, self.filhote)
 
     # sistema de carregamento
     def carregar(self, data: dict) -> None:
@@ -46,6 +47,16 @@ class Game:
         self.wallet.coins     = data["moedas"]
         self.turno            = data["turno"]
 
+        filhote_data = data.get("filhote")
+        if filhote_data:
+            self.filhote = DuckSon(filhote_data["nome"])
+            self.filhote._hunger  = filhote_data["fome"]
+            self.filhote._thirst  = filhote_data["sede"]
+            self.filhote._stress  = filhote_data["estresse"]
+            self.filhote._is_sick = filhote_data["doente"]
+        else:
+            self.filhote = None
+
     # acao basica de compra
     def buy(self, item_id: int) -> str:
         return self.store.purchase(item_id, self.wallet, self.duck)
@@ -60,10 +71,31 @@ class Game:
                 break
             try:
                 item_id = int(op)
-                resultado = self.buy(item_id)
-                mensagem_evento(resultado)
             except ValueError:
                 mensagem_evento("ID invalido.")
+                continue
+
+            item = self.store.find_item(item_id)
+            if item is None:
+                mensagem_evento("Produto nao encontrado.")
+                continue
+
+            # se houver filhote, pergunta em qual dos dois usar o item
+            alvo = self.duck
+            if self.filhote is not None:
+                escolha = input(
+                    f"  Usar em quem? [1] {self.duck.name}  [2] {self.filhote.name} (filhote): "
+                ).strip()
+                if escolha == "2":
+                    alvo = self.filhote
+
+            # filhote nao pode usar itens de vicio (cigarro/alcool)
+            if isinstance(alvo, DuckSon) and item.effect in ("smoke", "alcohol"):
+                mensagem_evento(f"{alvo.name} e um filhote e nao pode usar esse item.")
+                continue
+
+            resultado = self.store.purchase(item_id, self.wallet, alvo)
+            mensagem_evento(resultado)
 
     # acao do minigame de corrida
     def _acao_corrida(self):
@@ -117,15 +149,26 @@ class Game:
     # acao de criar um filho
     def _acao_reproduzir(self):
         print("\n" + "="*44)
-        print("  Se tiver um filhote, o seu pato atual vai se aposentar.")
+
+        if self.filhote is not None:
+            mensagem_evento(
+                f"{self.duck.name} ja tem um filhote, {self.filhote.name}.\n"
+                f"  Cuide bem dele antes de pensar em outro!"
+            )
+            return
+
+        print(f"  Um filhote vai nascer e ficar ao lado de {self.duck.name}.")
         confirmacao = input("  Tem certeza que deseja continuar? (s/n): ").strip().lower()
         if confirmacao == "s":
             nome_filhote = input("  Qual sera o nome do filhote? ").strip()
             if not nome_filhote:
                 nome_filhote = "Duckinho Jr"
-            
-            self.duck = self.duck.reproduce(nome_filhote)
-            mensagem_evento(f" Um ovo chocou! O pato velho aposentou-se.\n  Bem-vindo a nova geracao, {self.duck.name}!")
+
+            self.filhote = self.duck.reproduce(nome_filhote)
+            mensagem_evento(
+                f" Um ovo chocou! Bem-vindo, {self.filhote.name}!\n"
+                f"  Agora sao 2 patos para cuidar."
+            )
 
     # sistema de morte do pato
     def _verificar_game_over(self) -> bool:
@@ -133,13 +176,18 @@ class Game:
             return True
         if self.duck.hunger >= 100 and self.duck.thirst >= 100:
             return True
+        if self.filhote is not None:
+            if self.filhote.hunger >= 100 and self.filhote.stress >= 100:
+                return True
+            if self.filhote.hunger >= 100 and self.filhote.thirst >= 100:
+                return True
         return False
 
     # loop central do jogo
     def rodar(self):
         while self.rodando:
             self.turno += 1
-            exibir_status(self.duck, self.wallet, self.turno)
+            exibir_status(self.duck, self.wallet, self.turno, self.filhote)
 
             # verifica game over
             if self._verificar_game_over():
@@ -183,3 +231,5 @@ class Game:
 
             self.salvar()
             self.duck.pass_time()
+            if self.filhote is not None:
+                self.filhote.pass_time()

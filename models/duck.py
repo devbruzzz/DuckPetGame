@@ -166,3 +166,11 @@ class DuckSon(DuckDad):
         super().__init__(name)
         self._is_smoker = False
         self._is_alcoholic = False
+
+    # filhote nao pode fumar (nunca se torna viciado)
+    def smoking(self, smoking_value):
+        return f"{self.name} e um filhote e nao pode fumar."
+
+    # filhote nao pode beber alcool (nunca se torna viciado)
+    def drinking_alcohol(self, alcohol_value):
+        return f"{self.name} e um filhote e nao pode beber alcool."

@@ -23,7 +23,7 @@ SAVE_FILE = _get_save_dir() / "save.json"
 BACKUP_FILE = _get_save_dir() / "save_backup.json"
 
 # sistema de salvar os dados no json
-def save_game(duck, wallet, turno: int) -> None:
+def save_game(duck, wallet, turno: int, filhote=None) -> None:
     if SAVE_FILE.exists():
         try:
             SAVE_FILE.replace(BACKUP_FILE)
@@ -31,7 +31,7 @@ def save_game(duck, wallet, turno: int) -> None:
             pass
 
     data = {
-        "versao": "1.0",
+        "versao": "1.1",
         "salvo_em": datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
         "turno": turno,
         "moedas": wallet.coins,
@@ -44,6 +44,13 @@ def save_game(duck, wallet, turno: int) -> None:
             "doente": duck._is_sick,
             "fumante": duck._is_smoker,
             "alcoolatra": duck._is_alcoholic,
+        },
+        "filhote": None if filhote is None else {
+            "nome": filhote.name,
+            "fome": filhote._hunger,
+            "sede": filhote._thirst,
+            "estresse": filhote._stress,
+            "doente": filhote._is_sick,
         },
     }
 
@@ -88,10 +95,14 @@ def save_info() -> str:
     data = load_game()
     if data is None:
         return " Nenhum save encontrado. Comecando um novo jogo!"
-    return (
+    info = (
         f" Save encontrado!\n"
         f" Pato: {data['pato']['nome']}  | "
         f"Turno: {data['turno']}  | "
         f"Moedas: {data['moedas']}  | "
         f"Salvo em: {data['salvo_em']}"
     )
+    filhote = data.get("filhote")
+    if filhote:
+        info += f"\n Filhote: {filhote['nome']}"
+    return info
