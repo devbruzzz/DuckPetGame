@@ -160,28 +160,28 @@ def exibir_status(duck, wallet, turno, filhote=None):
     
     # mensagens de status
     if duck.hunger == 0:
-        print(f"  {duck.name} esta de barriga cheia!")
+        print(f"  {duck.name} está de barriga cheia!")
     elif duck.hunger >= 85:
-        print(f"  {duck.name} esta com muita fome. Alimente ele agora!")
+        print(f"  {duck.name} está com muita fome. Alimente ele agora!")
 
     if duck.thirst == 0:
-        print(f"  {duck.name} esta totalmente hidratado!")
+        print(f"  {duck.name} está totalmente hidratado!")
     elif duck.thirst >= 85:
-        print(f"  {duck.name} esta com sede. De agua para ele!")
+        print(f"  {duck.name} está com sede. De agua para ele!")
 
     if duck.stress == 0:
-        print(f"  {duck.name} esta totalmente relaxado!")
+        print(f"  {duck.name} está totalmente relaxado!")
     elif duck.stress >= 85:
-        print(f"  {duck.name} esta muito estressado. Ajude ele a relaxar!")
+        print(f"  {duck.name} está muito estressado. Ajude ele a relaxar!")
 
     if duck.alcohol == 0:
-        print(f"  A vontade de beber alcool de {duck.name} esta saciada!")
+        print(f"  A vontade de beber álcool de {duck.name} está saciada!")
     elif duck.alcohol >= 85:
-        print(f"  {duck.name} esta em crise de abstinencia! De alcool para ele!")
+        print(f"  {duck.name} está em crise de abstinencia! De álcool para ele!")
     
     if duck.is_sick:
         print()
-        print("   O pato esta doente! Leve-o ao veterinario na loja.")
+        print("   O pato está doente! Leve-o ao veterinario na loja.")
 
     # status do filhote (sem barra de alcool, pois ele nao pode se viciar)
     if filhote is not None:
@@ -194,13 +194,13 @@ def exibir_status(duck, wallet, turno, filhote=None):
         print()
 
         if filhote.hunger >= 85:
-            print(f"  {filhote.name} esta com muita fome. Alimente ele agora!")
+            print(f"  {filhote.name} está com muita fome. Alimente ele agora!")
         if filhote.thirst >= 85:
-            print(f"  {filhote.name} esta com sede. De agua para ele!")
+            print(f"  {filhote.name} está com sede. De agua para ele!")
         if filhote.stress >= 85:
-            print(f"  {filhote.name} esta muito estressado. Ajude ele a relaxar!")
+            print(f"  {filhote.name} está muito estressado. Ajude ele a relaxar!")
         if filhote.is_sick:
-            print(f"   {filhote.name} esta doente! Leve-o ao veterinario na loja.")
+            print(f"   {filhote.name} está doente! Leve-o ao veterinario na loja.")
         
     print()
     print(_linha())
@@ -246,7 +246,7 @@ def tela_game_over(duck, turno):
     limpar_tela()
     _cabecalho("GAME OVER")
     print(desenhar_pato(duck))
-    print(f"  {duck.name} nao aguentou mais o descuido...")
+    print(f"  {duck.name} não aguentou mais o descuido...")
     print(f"  O jogo durou {turno} turno(s).")
     print()
     print(_linha())

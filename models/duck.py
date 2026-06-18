@@ -169,8 +169,8 @@ class DuckSon(DuckDad):
 
     # filhote nao pode fumar (nunca se torna viciado)
     def smoking(self, smoking_value):
-        return f"{self.name} e um filhote e nao pode fumar."
+        return f"{self.name} é um filhote e não pode fumar."
 
     # filhote nao pode beber alcool (nunca se torna viciado)
     def drinking_alcohol(self, alcohol_value):
-        return f"{self.name} e um filhote e nao pode beber alcool."
+        return f"{self.name} é um filhote e não pode beber alcool."

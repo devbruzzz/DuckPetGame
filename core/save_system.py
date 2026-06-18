@@ -94,7 +94,7 @@ def save_exists() -> bool:
 def save_info() -> str:
     data = load_game()
     if data is None:
-        return " Nenhum save encontrado. Comecando um novo jogo!"
+        return " Nenhum save encontrado. Começando um novo jogo!"
     info = (
         f" Save encontrado!\n"
         f" Pato: {data['pato']['nome']}  | "

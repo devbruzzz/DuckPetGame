@@ -21,7 +21,7 @@ def _menu_inicial() -> str:
             return "continuar"
         elif opcao == "2":
             confirmacao = input(
-                " Tem certeza? O save atual sera APAGADO. (s/n): "
+                " Tem certeza? O save atual será APAGADO. (s/n): "
             ).strip().lower()
             if confirmacao == "s":
                 delete_save()
@@ -30,7 +30,7 @@ def _menu_inicial() -> str:
         else:
             return "sair"
     else:
-        print("  [1] Comecar novo jogo")
+        print("  [1] Começar novo jogo")
         print("  [0] Sair")
         opcao = input("\n  Escolha: ").strip()
         return "novo" if opcao == "1" else "sair"
@@ -50,7 +50,7 @@ def main():
     decisao = _menu_inicial()
 
     if decisao == "sair":
-        print("\n Ate logo! ")
+        print("\n Até logo! ")
         return
 
     if decisao == "continuar":

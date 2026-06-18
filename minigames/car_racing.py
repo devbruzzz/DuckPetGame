@@ -7,7 +7,7 @@ class CarRacing:
             "Pista do Parque",
             "Circuito do Lago",
             "Rua da Favela",
-            "Autodromo do Pato"
+            "Autódromo do Pato"
         ]
 
     # sistema principal de jogatina
@@ -18,7 +18,7 @@ class CarRacing:
         if performance >= 85:
             reward = 40
             message = (
-                f"Voce correu na {track} e venceu com estilo!"
+                f"Você correu na {track} e venceu com estilo!"
                 "\nRecompensa: +40 moedas."
             )
         elif performance >= 60:
@@ -30,7 +30,7 @@ class CarRacing:
         elif performance >= 35:
             reward = 15
             message = (
-                f"Voce completou a corrida na {track}. Nao foi facil, mas valeu."
+                f"Voce completou a corrida na {track}. Não foi fácil, mas valeu."
                 "\nRecompensa: +15 moedas."
             )
         else:

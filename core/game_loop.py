@@ -72,12 +72,12 @@ class Game:
             try:
                 item_id = int(op)
             except ValueError:
-                mensagem_evento("ID invalido.")
+                mensagem_evento("ID inválido.")
                 continue
 
             item = self.store.find_item(item_id)
             if item is None:
-                mensagem_evento("Produto nao encontrado.")
+                mensagem_evento("Produto não encontrado.")
                 continue
 
             # se houver filhote, pergunta em qual dos dois usar o item
@@ -91,7 +91,7 @@ class Game:
 
             # filhote nao pode usar itens de vicio (cigarro/alcool)
             if isinstance(alvo, DuckSon) and item.effect in ("smoke", "alcohol"):
-                mensagem_evento(f"{alvo.name} e um filhote e nao pode usar esse item.")
+                mensagem_evento(f"{alvo.name} é um filhote e não pode usar esse item.")
                 continue
 
             resultado = self.store.purchase(item_id, self.wallet, alvo)
@@ -118,8 +118,8 @@ class Game:
     def _acao_conversar(self):
         frases_normais = [
             "QUACK! (oi, oi, oi!)",
-            "quack... (to entediado)",
-            "QUACK QUACK! (me da biscoito!)",
+            "quack... (tô entediado)",
+            "QUACK QUACK! (me dá biscoito!)",
             "quack~ (gostei dessa conversa)",
         ]
         if self.duck.hunger >= 70:
@@ -127,9 +127,9 @@ class Game:
         elif self.duck.stress >= 70:
             frase = "quack... (muito estressado, preciso relaxar)"
         elif self.duck.alcohol >= 70:
-            frase = "quaaaaack... (to em crise, preciso da bebida)"
+            frase = "quaaaaack... (tô em crise, preciso da bebida)"
         elif self.duck.is_sick:
-            frase = "quack... *tosse* (to doente, leva no vet)"
+            frase = "quack... *tosse* (tô doente, leva no vet)"
         else:
             frase = random.choice(frases_normais)
 
@@ -144,7 +144,7 @@ class Game:
             msg = self.duck.change_name(novo_nome)
             mensagem_evento(msg)
         else:
-            mensagem_evento("Nome invalido.")
+            mensagem_evento("Nome inválido.")
 
     # acao de criar um filho
     def _acao_reproduzir(self):
@@ -152,7 +152,7 @@ class Game:
 
         if self.filhote is not None:
             mensagem_evento(
-                f"{self.duck.name} ja tem um filhote, {self.filhote.name}.\n"
+                f"{self.duck.name} já tem um filhote, {self.filhote.name}.\n"
                 f"  Cuide bem dele antes de pensar em outro!"
             )
             return
@@ -221,7 +221,7 @@ class Game:
                 self.rodando = False
                 break
             else:
-                mensagem_evento("Opcao invalida. O pato te encarou em silencio.")
+                mensagem_evento("Opção inválida. O pato te encarou em silencio.")
 
             # sorteio de imprevistos
             mensagem = self.event_manager.trigger_event(self.duck, self.wallet)
