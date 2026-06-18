@@ -7,7 +7,9 @@ class HangmanGame:
             "PATO", "LAGO", "CHAPEU", "QUACK", 
             "BICO", "PAVAO", "RACAO", "MOEDA", 
             "VETERINARIO", "BRINQUEDO", "CARRO", 
-            "DADO", "LOJA", "MINIGAME", "ANIMAL",
+            "DADO", "LOJA", "MINIGAME", "ANIMAL", 
+            "FERNANDO", "PYTHON", "FILHOTE",
+            "AVESTRUZ", "MARRECO", "AMARELO"
         ]
         self.max_errors = 6
         self.reward = 30
